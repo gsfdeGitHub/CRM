@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--引入applicationContext_Service.xml文件-->
+    <import resource="classpath:applicationContext_service.xml"></import>
+
+    <!--包扫描，其实这里不用包扫描，因为mapper包下没有类需要交给Spring进行管理-->
+    <context:component-scan base-package="com.gsf.CRM"></context:component-scan>
+
+    <!--引入外部属性配置文件-->
+    <context:property-placeholder location="classpath:JDBC.properties"></context:property-placeholder>
+
+    <!--配置数据源-->
+    <bean id="datasource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!--SqlSessionFactoryBean配置-->
+    <!--对于Spring来说，它就是一个数据库实例，拿到这个实例之后就可以集成MyBatis核心配置文件等等-->
+    <bean  class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入SqlMapConfig.xml文件-->
+        <property name="configLocation" value="classpath:SqlMapConfig.xml"></property>
+        <!--指定实体类别名-->
+        <property name="typeAliasesPackage" value="com.gsf.CRM.settings.pojo,com.gsf.CRM.workbench.pojo"></property>
+        <!--注入数据源-->
+        <property name="dataSource" ref="datasource"></property>
+    </bean>
+
+    <!--扫描mapper.xml文件和接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.gsf.CRM.settings.mapper,
+                                                                      com.gsf.CRM.workbench.mapper"></property>
+    </bean>
+</beans>
